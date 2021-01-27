@@ -2,23 +2,26 @@ image_name := 'gcr.io/dm-docker/demo/scala:dev'
 jar_name := 'application.jar'
 work_dir := '/opt/spark/work-dir'
 cluster_url := 'https://demo.datamechanics.co'
+service_account := env_var('HOME') + '/.config/gcloud/application_default_credentials.json'
 api_key := 'null'
 
 # Build the JAR
 build_jar:
     sbt assembly
 
-# Build the image and push it to the registry
+# Build the image
 build_image:
     docker build -t {{image_name}} .
 
-# Build everything and push it to the registry
+# Build everything and push the image to the registry
 update_registry: build_jar build_image
     docker push {{image_name}}
 
 # Run locally with JAR mounted
 _run_locally_mounted main_class +args='':
     docker run --mount type=bind,source="$(pwd)",target={{work_dir}} \
+               --mount type=bind,source={{service_account}},target=/sa.json \
+               --env GOOGLE_APPLICATION_CREDENTIALS=/sa.json \
         {{image_name}} driver --class {{main_class}} local://{{work_dir}}/target/scala-2.12/{{jar_name}} {{args}}
 
 # Run locally with JAR baked-in
