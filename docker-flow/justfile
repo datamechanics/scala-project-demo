@@ -33,21 +33,24 @@ run_spark_pi_locally arg='10': (run_locally 'co.datamechanics.pi.Main' arg)
 run_spark_pi_locally_mounted arg='10': (run_locally 'co.datamechanics.pi.Main' arg)
 
 # Run JAR on Data Mechanics
-run_spark_pi_on_cluster arg='100':
+run_spark_pi_on_cluster arg='100': (_run_on_cluster 'scala-spark-pi' 'co.datamechanics.pi.Main' '"' + arg + '"')
+
+# Run JAR on Data Mechanics
+_run_on_cluster job_name main_class +args='':
     #!/bin/bash
     output=$(curl -s --request POST {{cluster_url}}/api/apps/ \
         --header 'Content-Type: application/json' \
         --header 'X-API-Key: {{api_key}}' \
         --data-raw '{
-          "jobName": "scala-spark-pi",
+          "jobName": "{{job_name}}",
           "configOverrides": {
             "type": "Scala",
             "sparkVersion": "3.0.1",
             "image": "{{image_name}}",
             "imagePullPolicy": "Always",
             "mainApplicationFile": "local://{{work_dir}}/{{jar_name}}",
-            "mainClass": "co.datamechanics.pi.Main",
-            "arguments": ["{{arg}}"]
+            "mainClass": "{{main_class}}",
+            "arguments": [{{args}}]
           }
         }')
     echo $output | jq -r
