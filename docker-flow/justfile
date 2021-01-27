@@ -17,23 +17,29 @@ update_registry: build_jar build_image
     docker push {{image_name}}
 
 # Run locally with JAR mounted
-run_locally_mounted main_class +args='':
+_run_locally_mounted main_class +args='':
     docker run --mount type=bind,source="$(pwd)",target={{work_dir}} \
         {{image_name}} driver --class {{main_class}} local://{{work_dir}}/target/scala-2.12/{{jar_name}} {{args}}
 
 # Run locally with JAR baked-in
-run_locally main_class +args='':
+_run_locally main_class +args='':
     docker run \
         {{image_name}} driver --class {{main_class}} local://{{work_dir}}/{{jar_name}} {{args}}
 
 # Run JAR locally
-run_spark_pi_locally arg='10': (run_locally 'co.datamechanics.pi.Main' arg)
+run_spark_pi_locally arg='10': (_run_locally 'co.datamechanics.pi.Main' arg)
 
-# Run JAR locally
-run_spark_pi_locally_mounted arg='10': (run_locally 'co.datamechanics.pi.Main' arg)
+# Run JAR locally without needing to rebuild the image
+run_spark_pi_locally_mounted arg='10': (_run_locally_mounted 'co.datamechanics.pi.Main' arg)
+
+# Run JAR locally without needing to rebuild the image
+run_wordcount_locally_mounted input output: (_run_locally_mounted 'co.datamechanics.wordcount.Main' input + ' ' + output)
 
 # Run JAR on Data Mechanics
-run_spark_pi_on_cluster arg='100': (_run_on_cluster 'scala-spark-pi' 'co.datamechanics.pi.Main' '"' + arg + '"')
+run_spark_pi_on_cluster arg='100': (_run_on_cluster 'scala-spark-pi' 'co.datamechanics.pi.Main' arg)
+
+# Run JAR on Data Mechanics
+run_wordcount_on_cluster input output: (_run_on_cluster 'scala-wordcount' 'co.datamechanics.wordcount.Main' '"' + input + '", "' + output + '"')
 
 # Run JAR on Data Mechanics
 _run_on_cluster job_name main_class +args='':
