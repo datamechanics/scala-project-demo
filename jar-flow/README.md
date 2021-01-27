@@ -1,11 +1,8 @@
-# Scala dev workflow example
+# Scala dev workflow using an object store
 
 This folder proposes an example of dev workflow for Scala projects on Data Mechanics.
 
 It pushes the JAR built locally on an object store (GCS) and configures the application on Data Mechanics to use it.
-
-An alternative would be to build a Docker image that contains the JAR.
-This is not shown in this repository.
 
 This folder uses `just` as a command runner (it's a simpler replacement for make).
 
