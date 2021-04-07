@@ -1,7 +1,6 @@
 val sparkVersionValue = "2.4.5"
 
-crossScalaVersions := Seq("2.11.12", "2.12.12")
-
+scalaVersion := "2.11.12"
 organization := "co.datamechanics"
 name := "datamechanics-demo"
 version := "0.1.0-SNAPSHOT"
