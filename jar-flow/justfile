@@ -1,16 +1,26 @@
 remote_folder := 'gs://dm-demo-data/code'
 jar_name := 'datamechanics-demo-assembly-0.1.0-SNAPSHOT.jar'
 cluster_url := 'https://demo.datamechanics.co'
+work_dir := '/opt/spark/work-dir'
 api_key := 'null'
 
 # Run JAR locally
 run_spark_pi_locally +arg='10':
     sbt "runMain co.datamechanics.pi.LocalMain {{arg}}"
 
-# Build the JAR and push it to GCS
-update_jar:
+# Build the JAR
+build_jar:
     sbt assembly
+
+# Build the JAR and push it to GCS
+update_jar: build_jar
     gsutil cp target/scala-2.12/{{jar_name}} {{remote_folder}}/{{jar_name}}
+
+# Run JAR locally in a Docker image
+run_spark_pi_in_local_image image +args='10':
+    docker run --mount type=bind,source="$(pwd)",target={{work_dir}} \
+        {{image}} \
+        driver --class co.datamechanics.pi.LocalMain local://{{work_dir}}/target/scala-2.12/datamechanics-demo-assembly-0.1.0-SNAPSHOT.jar {{args}}
 
 # Run JAR on Data Mechanics
 run_spark_pi_on_cluster +arg='100':

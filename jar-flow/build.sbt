@@ -1,17 +1,12 @@
-val sparkVersionValue = "3.0.1"
+val sparkVersionValue = "2.4.5"
 
-ThisBuild / scalaVersion     := "2.12.8"
-ThisBuild / version          := "0.1.0-SNAPSHOT"
-ThisBuild / organization     := "co.datamechanics"
-ThisBuild / organizationName := "datamechanics"
+crossScalaVersions := Seq("2.11.12", "2.12.12")
 
-lazy val root = (project in file("."))
-  .settings(
-    name := "datamechanics-demo",
-    libraryDependencies ++= Seq(
-      "org.apache.spark" %% "spark-sql" % sparkVersionValue % "provided"
-    ),
-  )
+organization := "co.datamechanics"
+name := "datamechanics-demo"
+version := "0.1.0-SNAPSHOT"
+
+libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersionValue % "provided"
 
 // uses compile classpath for the run task, including "provided" jar (cf http://stackoverflow.com/a/21803413/3827)
 run in Compile := Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)).evaluated
